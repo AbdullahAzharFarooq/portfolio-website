@@ -99,7 +99,7 @@ export default function Services() {
               threshold={0.08}
             >
               <a
-                href="mailto:abdullahazharfarooq01@gmail.com"
+                href="/#top"
                 aria-label={`Inquire about ${s.title} service`}
                 className="group relative grid grid-cols-[3rem_1fr] items-start gap-x-6 gap-y-4 py-10 transition-colors duration-300 hover:bg-white/[0.03] lg:grid-cols-[4rem_1.1fr_1fr_2.5rem] lg:items-center lg:py-12 cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >

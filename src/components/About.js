@@ -59,7 +59,7 @@ export default function About() {
                   Available for hire
                 </span>
                 <a
-                  href="mailto:abdullahazharfarooq01@gmail.com"
+                  href="/#top"
                   className="whitespace-nowrap rounded-full bg-accent px-3 py-1.5 font-semibold text-black transition-transform hover:scale-105"
                 >
                   Hire me

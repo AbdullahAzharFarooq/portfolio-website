@@ -1,10 +1,9 @@
 import Link from "next/link";
 
 const SITEMAP = [
-  { label: "Work", href: "/#work" },
-  { label: "Solutions", href: "/#services" },
   { label: "About", href: "/#about" },
-  { label: "Contact", href: "mailto:abdullahazharfarooq01@gmail.com" },
+  { label: "Solutions", href: "/#services" },
+  { label: "Work", href: "/#work" },
 ];
 
 const SOLUTIONS = [

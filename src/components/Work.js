@@ -120,7 +120,7 @@ export default function Work() {
               </h3>
             </div>
             <a
-              href="mailto:abdullahazharfarooq01@gmail.com"
+              href="/#top"
               className="whitespace-nowrap rounded-full bg-accent px-6 py-3 text-xs font-bold uppercase tracking-wider text-black shadow-[0_0_20px_rgba(205,255,58,0.3)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_28px_rgba(205,255,58,0.6)]"
             >
               Start a Conversation →
