@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 
 const LINKS = [
@@ -37,9 +38,14 @@ export default function Nav() {
             href="/#top"
             className="group flex shrink-0 items-center gap-2.5 whitespace-nowrap transition-opacity hover:opacity-90"
           >
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/[0.08] border border-white/15 font-display text-xs font-extrabold text-white transition-all group-hover:border-accent group-hover:bg-accent group-hover:text-black">
-              AA
-            </span>
+            <Image
+              src="/images/logo-mark.png"
+              alt=""
+              width={327}
+              height={296}
+              priority
+              className="h-8 w-8 shrink-0 object-contain transition-transform duration-300 group-hover:scale-110"
+            />
             <span className="font-display text-sm font-bold tracking-[0.18em] text-ink uppercase">
               Abdullah Azhar<span className="text-accent">.</span>
             </span>

@@ -124,6 +124,7 @@ export default function RootLayout({ children }) {
     <html
       lang="en"
       className={`${sora.variable} ${caveat.variable} ${inter.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <head>
         <script
@@ -131,7 +132,7 @@ export default function RootLayout({ children }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <Preloader />
         <SketchFilter />
         <GrainOverlay />

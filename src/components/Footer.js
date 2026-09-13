@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const SITEMAP = [
@@ -17,9 +18,28 @@ const SOLUTIONS = [
 
 const EMAIL = "abdullahazharfarooq01@gmail.com";
 
+const SOCIALS = [
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/abdullahazhar71?utm_source=ig_web_button_share_sheet&igsi=ZDNlZDc0MzIxNw==",
+    icon: (
+      <>
+        <rect x="3" y="3" width="18" height="18" rx="5" />
+        <circle cx="12" cy="12" r="4" />
+        <circle cx="17.5" cy="6.5" r="0.9" fill="currentColor" stroke="none" />
+      </>
+    ),
+  },
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/share/19VCUxujwA/?mibextid=wwXIfr",
+    icon: <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />,
+  },
+];
+
 export default function Footer() {
   return (
-    <footer className="section-dark relative overflow-hidden border-t border-white/10">
+    <footer id="contact" className="section-dark relative overflow-hidden border-t border-white/10">
       <div className="bg-grid absolute inset-0 opacity-30 pointer-events-none" />
       <div className="pointer-events-none absolute left-1/2 top-0 h-72 w-[40rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/[0.07] blur-[120px]" />
 
@@ -28,9 +48,13 @@ export default function Footer() {
           {/* Brand */}
           <div className="max-w-sm">
             <Link href="/#top" className="group inline-flex items-center gap-2.5">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.08] font-display text-xs font-extrabold text-white transition-all duration-300 group-hover:border-accent group-hover:bg-accent group-hover:text-black">
-                AA
-              </span>
+              <Image
+                src="/images/logo-mark.png"
+                alt=""
+                width={327}
+                height={296}
+                className="h-9 w-9 shrink-0 object-contain transition-transform duration-300 group-hover:scale-110"
+              />
               <span className="font-display text-sm font-bold uppercase tracking-[0.18em] text-ink">
                 Abdullah Azhar<span className="text-accent">.</span>
               </span>
@@ -96,33 +120,48 @@ export default function Footer() {
               <p className="mt-4 text-sm text-muted-dark">
                 Direct response within 24 hours.
               </p>
-              <a
-                href="https://www.instagram.com/abdullahazhar71?utm_source=ig_web_button_share_sheet&igsi=ZDNlZDc0MzIxNw=="
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-4 inline-flex items-center gap-2 text-sm text-muted-dark transition-colors duration-200 hover:text-accent"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="3" width="18" height="18" rx="5" />
-                  <circle cx="12" cy="12" r="4" />
-                  <circle cx="17.5" cy="6.5" r="0.9" fill="currentColor" stroke="none" />
-                </svg>
-                <span>@abdullahazhar71</span>
-              </a>
+              <div className="mt-5 flex flex-wrap gap-x-5 gap-y-3">
+                {SOCIALS.map((s) => (
+                  <a
+                    key={s.label}
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm text-muted-dark transition-colors duration-200 hover:text-accent"
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      {s.icon}
+                    </svg>
+                    <span>{s.label}</span>
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
         {/* Bottom bar */}
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-xs text-muted-dark sm:flex-row">
-          <span>© {new Date().getFullYear()} Abdullah Azhar. All rights reserved.</span>
-          <a
+          <span suppressHydrationWarning>
+            © {new Date().getFullYear()} Abdullah Azhar. All rights reserved.
+          </span>
+          <Link
             href="/#top"
             className="inline-flex items-center gap-1.5 transition-colors duration-200 hover:text-accent"
           >
             <span>Back to top</span>
             <span aria-hidden="true">↑</span>
-          </a>
+          </Link>
         </div>
       </div>
     </footer>

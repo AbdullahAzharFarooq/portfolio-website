@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 const STATUS_MESSAGES = [
@@ -100,9 +101,14 @@ export default function Preloader() {
 
         {/* Center Minimalist Brand Monogram */}
         <div className="absolute flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-[#111112] shadow-md">
-          <span className="font-display text-xs font-extrabold tracking-wider text-white">
-            AA<span className="text-accent">.</span>
-          </span>
+          <Image
+            src="/images/logo-mark.png"
+            alt=""
+            width={327}
+            height={296}
+            priority
+            className="h-6 w-6 object-contain"
+          />
         </div>
       </div>
 

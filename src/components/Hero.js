@@ -164,7 +164,7 @@ export default function Hero() {
             <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
           </a>
           <a
-            href="/#top"
+            href="#contact"
             className="flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.03] px-7 py-3.5 text-xs sm:text-sm font-bold uppercase tracking-wider text-ink backdrop-blur-sm transition-all duration-300 hover:border-accent hover:bg-white/[0.08] hover:text-accent hover:scale-105"
           >
             <span>Tell Me Your Bottleneck</span>

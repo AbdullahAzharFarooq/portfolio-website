@@ -98,11 +98,7 @@ export default function Services() {
               duration={0.7}
               threshold={0.08}
             >
-              <a
-                href="/#top"
-                aria-label={`Inquire about ${s.title} service`}
-                className="group relative grid grid-cols-[3rem_1fr] items-start gap-x-6 gap-y-4 py-10 transition-colors duration-300 hover:bg-white/[0.03] lg:grid-cols-[4rem_1.1fr_1fr_2.5rem] lg:items-center lg:py-12 cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-              >
+              <div className="group relative grid grid-cols-[3rem_1fr] items-start gap-x-6 gap-y-4 rounded-xl py-10 transition-colors duration-300 hover:bg-white/[0.03] lg:grid-cols-[4rem_1.1fr_1fr_2.5rem] lg:items-center lg:py-12">
                 <span
                   aria-hidden="true"
                   className="absolute left-0 top-0 h-full w-[2px] scale-y-0 bg-accent transition-transform duration-300 ease-out group-hover:scale-y-100"
@@ -162,10 +158,13 @@ export default function Services() {
                   </div>
                 </div>
 
-                <span className="col-start-2 row-start-1 hidden justify-self-end text-white/40 transition-all duration-300 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-accent lg:col-start-4 lg:flex">
+                <span
+                  aria-hidden="true"
+                  className="col-start-2 row-start-1 hidden justify-self-end text-white/40 transition-all duration-300 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-accent lg:col-start-4 lg:flex"
+                >
                   <Arrow />
                 </span>
-              </a>
+              </div>
             </Reveal>
           ))}
         </div>
