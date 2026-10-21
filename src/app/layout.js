@@ -3,6 +3,9 @@ import "./globals.css";
 import SketchFilter from "@/components/SketchFilter";
 import GrainOverlay from "@/components/GrainOverlay";
 import Preloader from "@/components/Preloader";
+import MotionProvider from "@/components/MotionProvider";
+import ScrollProgress from "@/components/ScrollProgress";
+import Cursor from "@/components/Cursor";
 
 const sora = Sora({
   variable: "--font-sora",
@@ -133,10 +136,14 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
-        <Preloader />
-        <SketchFilter />
-        <GrainOverlay />
-        {children}
+        <MotionProvider>
+          <Preloader />
+          <ScrollProgress />
+          <Cursor />
+          <SketchFilter />
+          <GrainOverlay />
+          {children}
+        </MotionProvider>
       </body>
     </html>
   );

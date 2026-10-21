@@ -1,6 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
+
+const OFFSETS = {
+  left: { x: -48 },
+  right: { x: 48 },
+  up: { y: 36 },
+  down: { y: -36 },
+  zoom: { scale: 0.92 },
+  fade: {},
+};
 
 export default function Reveal({
   children,
@@ -11,80 +21,22 @@ export default function Reveal({
   rootMargin = "0px 0px -40px 0px",
   className = "",
   style = {},
-  as: Component = "div",
+  as = "div",
   triggerOnce = true,
+  ...rest // e.g. data-* attributes
 }) {
-  const [isVisible, setIsVisible] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    // If browser doesn't support IntersectionObserver, reveal immediately
-    if (!("IntersectionObserver" in window)) {
-      setIsVisible(true);
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
-            if (triggerOnce) {
-              observer.unobserve(entry.target);
-            }
-          } else if (!triggerOnce) {
-            setIsVisible(false);
-          }
-        });
-      },
-      {
-        threshold,
-        rootMargin,
-      }
-    );
-
-    observer.observe(el);
-
-    return () => {
-      if (el) observer.unobserve(el);
-    };
-  }, [threshold, rootMargin, triggerOnce]);
-
-  // Determine transform offset based on direction
-  const getInitialTransform = () => {
-    switch (direction) {
-      case "left":
-        return "translateX(-48px)";
-      case "right":
-        return "translateX(48px)";
-      case "up":
-        return "translateY(36px)";
-      case "down":
-        return "translateY(-36px)";
-      case "zoom":
-        return "scale(0.92)";
-      case "fade":
-      default:
-        return "none";
-    }
-  };
-
-  const dynamicStyle = {
-    opacity: isVisible ? 1 : 0,
-    transform: isVisible ? "none" : getInitialTransform(),
-    transitionProperty: "opacity, transform",
-    transitionDuration: `${duration}s`,
-    transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
-    transitionDelay: `${delay}ms`,
-    willChange: isVisible ? "auto" : "opacity, transform",
-    ...style,
-  };
+  const Component = motion[as] ?? motion.div;
 
   return (
-    <Component ref={ref} className={className} style={dynamicStyle}>
+    <Component
+      {...rest}
+      className={className}
+      style={style}
+      initial={{ opacity: 0, ...OFFSETS[direction] }}
+      whileInView={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+      viewport={{ once: triggerOnce, amount: threshold, margin: rootMargin }}
+      transition={{ duration, delay: delay / 1000, ease: EASE_OUT }}
+    >
       {children}
     </Component>
   );

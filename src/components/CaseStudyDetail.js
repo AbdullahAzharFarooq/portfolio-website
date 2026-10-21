@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CheckIcon, LinkOutIcon } from "@/components/icons";
+import CountUp from "@/components/CountUp";
+import Reveal from "@/components/Reveal";
+import { LinkOutIcon } from "@/components/icons";
 import { CATEGORY_META, PROJECTS } from "@/lib/projects";
 
 export default function CaseStudyDetail({ project }) {
@@ -33,7 +35,7 @@ export default function CaseStudyDetail({ project }) {
   return (
     <div className="mx-auto w-full max-w-[1300px]">
       {/* Top Main Visual Banner */}
-      <div className="relative h-72 sm:h-96 lg:h-[28rem] w-full overflow-hidden rounded-2xl sm:rounded-3xl border border-black/5 shadow-lg">
+      <Reveal direction="zoom" duration={1} className="relative h-72 sm:h-96 lg:h-[28rem] w-full overflow-hidden rounded-2xl sm:rounded-3xl border border-black/5 shadow-lg">
         <Image
           src={photo.src}
           alt={photo.alt || title}
@@ -66,23 +68,26 @@ export default function CaseStudyDetail({ project }) {
             </a>
           )}
         </div>
-      </div>
+      </Reveal>
 
       {/* Impact Stats Grid */}
       {stats.length > 0 && (
         <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
-          {stats.map((s) => (
-            <div
+          {stats.map((s, idx) => (
+            <Reveal
               key={s.label}
-              className="rounded-2xl border border-black/5 bg-white p-5 sm:p-6 shadow-sm transition-all hover:shadow-md"
+              direction="up"
+              delay={idx * 90}
+              duration={0.7}
+              className="rounded-2xl border border-black/5 bg-white p-5 sm:p-6 shadow-sm transition-[box-shadow,translate] duration-300 hover:-translate-y-1 hover:shadow-md"
             >
               <p className="font-display text-2xl sm:text-3xl font-extrabold text-ink-dark">
-                {s.value}
+                <CountUp value={s.value} />
               </p>
               <p className="mt-1 text-xs font-medium text-muted-light leading-snug">
                 {s.label}
               </p>
-            </div>
+            </Reveal>
           ))}
         </div>
       )}
@@ -92,8 +97,8 @@ export default function CaseStudyDetail({ project }) {
         {/* Left Column: Problem, Solution & Features */}
         <div className="space-y-10">
           {/* Overview */}
-          <div className="rounded-2xl sm:rounded-3xl bg-white p-6 sm:p-8 border border-black/5 shadow-sm">
-            <span className="text-xs font-bold uppercase tracking-widest text-accent-dark text-[#6b8e00]">
+          <Reveal direction="up" duration={0.8} className="rounded-2xl sm:rounded-3xl bg-white p-6 sm:p-8 border border-black/5 shadow-sm">
+            <span className="text-xs font-bold uppercase tracking-widest text-accent-dark">
               The Challenge &amp; Solution
             </span>
             <h2 className="font-display mt-2 text-2xl font-bold text-ink-dark sm:text-3xl">
@@ -102,11 +107,11 @@ export default function CaseStudyDetail({ project }) {
             <p className="mt-4 text-sm sm:text-base leading-relaxed text-muted-light">
               {description || desc}
             </p>
-          </div>
+          </Reveal>
 
           {/* Key Deliverables */}
           {features.length > 0 && (
-            <div className="rounded-2xl sm:rounded-3xl bg-white p-6 sm:p-8 border border-black/5 shadow-sm">
+            <Reveal direction="up" duration={0.8} className="rounded-2xl sm:rounded-3xl bg-white p-6 sm:p-8 border border-black/5 shadow-sm">
               <span className="text-xs font-bold uppercase tracking-widest text-muted-light">
                 What Changed
               </span>
@@ -114,21 +119,28 @@ export default function CaseStudyDetail({ project }) {
                 What It Actually Does
               </h3>
               <ul className="mt-6 space-y-3.5">
-                {features.map((f) => (
-                  <li key={f} className="flex items-start gap-3 text-sm sm:text-base text-muted-light">
+                {features.map((f, idx) => (
+                  <Reveal
+                    key={f}
+                    as="li"
+                    direction="left"
+                    delay={idx * 80}
+                    duration={0.6}
+                    className="flex items-start gap-3 text-sm sm:text-base text-muted-light"
+                  >
                     <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent text-black font-bold text-xs">
                       ✓
                     </span>
                     <span>{f}</span>
-                  </li>
+                  </Reveal>
                 ))}
               </ul>
-            </div>
+            </Reveal>
           )}
 
           {/* Stack & Tools */}
           {stack.length > 0 && (
-            <div className="rounded-2xl sm:rounded-3xl bg-white p-6 sm:p-8 border border-black/5 shadow-sm">
+            <Reveal direction="up" duration={0.8} className="rounded-2xl sm:rounded-3xl bg-white p-6 sm:p-8 border border-black/5 shadow-sm">
               <span className="text-xs font-bold uppercase tracking-widest text-muted-light">
                 Technology
               </span>
@@ -139,13 +151,13 @@ export default function CaseStudyDetail({ project }) {
                 {stack.map((s) => (
                   <span
                     key={s}
-                    className="rounded-lg border border-black/10 bg-[#f8f7f4] px-3.5 py-1.5 text-xs font-medium text-ink-dark"
+                    className="rounded-lg border border-black/10 bg-[#f8f7f4] px-3.5 py-1.5 text-xs font-medium text-ink-dark transition-colors duration-300 hover:bg-accent/40"
                   >
                     {s}
                   </span>
                 ))}
               </div>
-            </div>
+            </Reveal>
           )}
         </div>
 
@@ -153,7 +165,7 @@ export default function CaseStudyDetail({ project }) {
         <div className="space-y-10">
           {/* Before vs After */}
           {compare && (
-            <div className="overflow-hidden rounded-2xl sm:rounded-3xl border border-black/5 shadow-sm">
+            <Reveal direction="right" duration={0.8} className="overflow-hidden rounded-2xl sm:rounded-3xl border border-black/5 shadow-sm">
               <div className="grid grid-cols-1 sm:grid-cols-2">
                 <div className="bg-white p-6 sm:p-8">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-muted-light">
@@ -172,29 +184,29 @@ export default function CaseStudyDetail({ project }) {
                   </p>
                 </div>
               </div>
-            </div>
+            </Reveal>
           )}
 
           {/* System Visual / Mockup Preview */}
           {(secondaryVisual || cardVisual) && (
-            <div className="overflow-hidden rounded-2xl sm:rounded-3xl border border-black/5 bg-[#111112] shadow-sm">
+            <Reveal direction="right" delay={100} duration={0.8} className="overflow-hidden rounded-2xl sm:rounded-3xl border border-black/5 bg-[#111112] shadow-sm" data-cursor-tone="dark">
               <div className="border-b border-white/10 px-6 py-3.5 flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-wider text-white/70">
                   How It Works
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <span className="h-2 w-2 rounded-full bg-accent" />
+                  <span className="h-2 w-2 animate-pulse rounded-full bg-accent" />
                   <span className="text-[10px] text-white/50 uppercase">Live Output</span>
                 </span>
               </div>
               <div className="h-64 sm:h-72 p-2">
                 {secondaryVisual || cardVisual}
               </div>
-            </div>
+            </Reveal>
           )}
 
           {/* Next / Previous Project Navigator */}
-          <div className="rounded-2xl sm:rounded-3xl bg-white p-6 sm:p-8 border border-black/5 shadow-sm">
+          <Reveal direction="right" delay={150} duration={0.8} className="rounded-2xl sm:rounded-3xl bg-white p-6 sm:p-8 border border-black/5 shadow-sm">
             <span className="text-xs font-bold uppercase tracking-widest text-muted-light">
               Browse Work
             </span>
@@ -219,7 +231,7 @@ export default function CaseStudyDetail({ project }) {
                 </span>
               </Link>
             </div>
-          </div>
+          </Reveal>
         </div>
       </div>
     </div>

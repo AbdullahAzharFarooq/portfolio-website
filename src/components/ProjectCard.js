@@ -1,9 +1,13 @@
 "use client";
 
+import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { motion, useInView, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import CountUp from "@/components/CountUp";
 import { LinkOutIcon } from "@/components/icons";
 import { CATEGORY_META } from "@/lib/projects";
+import { EASE_IN_OUT } from "@/lib/motion";
 
 export default function ProjectCard({ project, onQuickView, index = 0 }) {
   const meta = CATEGORY_META[project.categoryKey] || { label: "Case Study" };
@@ -11,18 +15,37 @@ export default function ProjectCard({ project, onQuickView, index = 0 }) {
 
   const isReversed = index % 2 === 1;
 
+  // Photo drifts inside its frame as the card scrolls past.
+  const frameRef = useRef(null);
+  const cardRef = useRef(null);
+  // Watch the unclipped card, not the clipped frame, to trigger the wipe.
+  const inView = useInView(cardRef, { once: true, amount: 0.2 });
+  const reduceMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: frameRef, offset: ["start end", "end start"] });
+  const photoY = useTransform(scrollYProgress, [0, 1], reduceMotion ? ["0%", "0%"] : ["-7%", "7%"]);
+
   return (
-    <article className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-white p-5 sm:p-6 lg:p-7 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.06)] border border-black/5 transition-all duration-300 hover:shadow-[0_12px_35px_-15px_rgba(0,0,0,0.12)] hover:border-black/10">
+    <article ref={cardRef} className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-white p-5 sm:p-6 lg:p-7 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.06)] border border-black/5 transition-[box-shadow,border-color,translate] duration-500 hover:-translate-y-1 hover:shadow-[0_24px_50px_-20px_rgba(0,0,0,0.18)] hover:border-black/10">
       <div className={`flex flex-col ${isReversed ? "lg:flex-row-reverse" : "lg:flex-row"} items-center gap-6 lg:gap-8 xl:gap-10`}>
-        {/* Left Side: Proportional Architectural/Tech Photo */}
-        <div className="relative w-full lg:w-[42%] xl:w-[40%] h-52 sm:h-64 lg:h-72 xl:h-80 shrink-0 overflow-hidden rounded-xl sm:rounded-2xl shadow-sm">
-          <Image
-            src={project.photo.src}
-            alt={project.photo.alt || project.title}
-            fill
-            sizes="(max-width: 1024px) 100vw, 450px"
-            className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-          />
+        {/* Photo: wipes open on scroll, click opens the quick preview */}
+        <motion.div
+          ref={frameRef}
+          onClick={() => onQuickView(project)}
+          data-cursor-label="Preview"
+          initial={{ clipPath: "inset(0% 0% 100% 0% round 16px)" }}
+          animate={inView ? { clipPath: "inset(0% 0% 0% 0% round 16px)", transitionEnd: { clipPath: "none" } } : undefined}
+          transition={{ duration: 1.1, ease: EASE_IN_OUT }}
+          className="relative w-full lg:w-[42%] xl:w-[40%] h-52 sm:h-64 lg:h-72 xl:h-80 shrink-0 cursor-pointer overflow-hidden rounded-xl sm:rounded-2xl shadow-sm"
+        >
+          <motion.div className="absolute inset-x-0 -inset-y-[8%]" style={{ y: photoY }}>
+            <Image
+              src={project.photo.src}
+              alt={project.photo.alt || project.title}
+              fill
+              sizes="(max-width: 1024px) 100vw, 450px"
+              className="object-cover transition-transform duration-[900ms] ease-out group-hover:scale-105"
+            />
+          </motion.div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
 
           {/* Top Left Number & Category Badge */}
@@ -48,7 +71,7 @@ export default function ProjectCard({ project, onQuickView, index = 0 }) {
                 Live <LinkOutIcon />
               </a>
             )}
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-black shadow transition-colors group-hover:bg-accent">
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-black shadow transition-all duration-500 group-hover:rotate-[360deg] group-hover:bg-accent">
               {Icon ? <Icon /> : project.n}
             </span>
           </div>
@@ -59,12 +82,12 @@ export default function ProjectCard({ project, onQuickView, index = 0 }) {
               {project.client}
             </span>
           </div>
-        </div>
+        </motion.div>
 
         {/* Right Side: Proportional Content */}
         <div className="flex w-full lg:w-[58%] xl:w-[60%] flex-col justify-between py-1">
           <div>
-            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-light">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] font-semibold uppercase tracking-widest text-muted-light">
               <span>{project.client}</span>
               <span>•</span>
               <span className="text-ink-dark font-bold">{meta.label}</span>
@@ -83,7 +106,7 @@ export default function ProjectCard({ project, onQuickView, index = 0 }) {
               {project.tags?.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-md border border-black/5 bg-[#f5f4ef] px-2.5 py-0.5 text-[11px] font-medium text-[#4a4940]"
+                  className="rounded-md border border-black/5 bg-[#f5f4ef] px-2.5 py-0.5 text-[11px] font-medium text-[#4a4940] transition-colors duration-300 hover:border-black/20 hover:bg-accent/40"
                 >
                   {tag}
                 </span>
@@ -96,7 +119,7 @@ export default function ProjectCard({ project, onQuickView, index = 0 }) {
                 {project.stats.slice(0, 4).map((s) => (
                   <div key={s.label}>
                     <p className="font-display text-base sm:text-lg font-extrabold text-ink-dark leading-tight">
-                      {s.value}
+                      <CountUp value={s.value} />
                     </p>
                     <p className="text-[10px] leading-tight text-muted-light mt-0.5">
                       {s.label}
@@ -111,10 +134,12 @@ export default function ProjectCard({ project, onQuickView, index = 0 }) {
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <Link
               href={`/work/${project.slug}`}
-              className="inline-flex items-center gap-2 rounded-lg border border-black/30 bg-transparent px-5 py-2.5 text-xs font-semibold text-ink-dark transition-all duration-300 hover:border-black hover:bg-black hover:text-white"
+              className="group/btn relative inline-flex items-center gap-2 overflow-hidden rounded-lg border border-black/30 bg-transparent px-5 py-2.5 text-xs font-semibold text-ink-dark transition-colors duration-300 hover:border-black hover:text-white"
             >
-              <span>View More</span>
-              <span className="font-bold transition-transform duration-300 group-hover:translate-x-1">→</span>
+              {/* fill slides up from the bottom on hover */}
+              <span className="absolute inset-0 translate-y-full bg-black transition-transform duration-300 ease-out group-hover/btn:translate-y-0" />
+              <span className="relative">View More</span>
+              <span className="relative font-bold transition-transform duration-300 group-hover/btn:translate-x-1">→</span>
             </Link>
 
             <button

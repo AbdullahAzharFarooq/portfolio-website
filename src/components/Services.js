@@ -1,4 +1,7 @@
 import Reveal from "@/components/Reveal";
+import SplitText from "@/components/SplitText";
+import VelocityMarquee from "@/components/VelocityMarquee";
+import DrawLine from "@/components/DrawLine";
 
 const SERVICES = [
   {
@@ -78,9 +81,11 @@ export default function Services() {
               <p className="font-script mb-2 text-2xl text-accent">
                 Not services — problems
               </p>
-              <h2 className="font-display text-5xl font-extrabold leading-none sm:text-6xl">
-                Where The Cracks Are
-              </h2>
+              <SplitText
+                as="h2"
+                text="Where The Cracks Are"
+                className="font-display text-5xl font-extrabold leading-none sm:text-6xl"
+              />
             </div>
             <p className="max-w-xs text-sm leading-relaxed text-muted-dark md:text-right">
               Six recurring problems I see inside growing teams — and exactly
@@ -89,7 +94,7 @@ export default function Services() {
           </div>
         </Reveal>
 
-        <div className="divide-y divide-white/10">
+        <div>
           {SERVICES.map((s, idx) => (
             <Reveal
               key={s.n}
@@ -99,6 +104,7 @@ export default function Services() {
               threshold={0.08}
             >
               <div className="group relative grid grid-cols-[3rem_1fr] items-start gap-x-6 gap-y-4 rounded-xl py-10 transition-colors duration-300 hover:bg-white/[0.03] lg:grid-cols-[4rem_1.1fr_1fr_2.5rem] lg:items-center lg:py-12">
+                {idx > 0 && <DrawLine className="absolute inset-x-0 top-0" delay={idx * 0.06} />}
                 <span
                   aria-hidden="true"
                   className="absolute left-0 top-0 h-full w-[2px] scale-y-0 bg-accent transition-transform duration-300 ease-out group-hover:scale-y-100"
@@ -106,16 +112,10 @@ export default function Services() {
                 />
 
                 <span className="relative col-start-1 row-start-1 block h-9 w-12 shrink-0 lg:h-10 lg:w-16">
-                  <span
-                    className="font-display absolute inset-0 text-3xl font-extrabold transition-opacity duration-300 group-hover:opacity-0 sm:text-4xl"
-                    style={{
-                      color: "transparent",
-                      WebkitTextStroke: "1px rgba(244, 243, 238, 0.35)",
-                    }}
-                  >
+                  <span className="font-display text-outline-dark absolute inset-0 text-3xl font-extrabold sm:text-4xl">
                     {s.n}
                   </span>
-                  <span className="font-display absolute inset-0 text-3xl font-extrabold text-accent opacity-0 transition-opacity duration-300 group-hover:opacity-100 sm:text-4xl">
+                  <span className="font-display absolute inset-0 text-3xl font-extrabold text-accent [clip-path:inset(100%_0_0_0)] transition-[clip-path] duration-500 ease-out group-hover:[clip-path:inset(0_0_0_0)] sm:text-4xl">
                     {s.n}
                   </span>
                 </span>
@@ -172,20 +172,13 @@ export default function Services() {
         <Reveal direction="up" delay={200} duration={0.8}>
           <div className="mt-20 border-t border-white/10 pt-16">
             <p className="font-script mb-6 text-center text-xl text-accent">The bottom line</p>
-            <div className="overflow-hidden">
-              <div className="animate-marquee flex w-max items-center whitespace-nowrap">
-                {[0, 1].map((i) => (
-                  <p
-                    key={i}
-                    aria-hidden={i === 1 ? "true" : undefined}
-                    className="font-display pr-12 text-3xl font-extrabold leading-snug sm:text-4xl"
-                  >
-                    I&apos;m not here to ship features — I&apos;m here to solve business problems.
-                    <span className="pl-12 text-accent">•</span>
-                  </p>
-                ))}
-              </div>
-            </div>
+            <VelocityMarquee baseVelocity={2.5}>
+              <p className="font-display pr-12 text-3xl font-extrabold leading-snug sm:text-4xl">
+                I&apos;m not here to ship features — I&apos;m here to{" "}
+                <span className="text-outline-accent">solve business problems.</span>
+                <span className="pl-12 text-accent">•</span>
+              </p>
+            </VelocityMarquee>
           </div>
         </Reveal>
       </div>

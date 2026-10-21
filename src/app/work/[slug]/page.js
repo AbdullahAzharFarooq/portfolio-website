@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import CaseStudyDetail from "@/components/CaseStudyDetail";
-import { LinkOutIcon } from "@/components/icons";
+import Reveal from "@/components/Reveal";
+import SplitText from "@/components/SplitText";
 import { CATEGORY_META, PROJECTS, getProject } from "@/lib/projects";
 
 export function generateStaticParams() {
@@ -37,19 +38,26 @@ export default async function ProjectPage({ params }) {
           <div className="pointer-events-none absolute h-96 w-96 rounded-full bg-accent/10 blur-[120px]" />
 
           <div className="relative mx-auto w-full max-w-[1300px]">
-            <Link
-              href="/#work"
-              className="mb-4 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-dark transition-colors hover:text-accent"
-            >
-              ← Back to all Case Studies
-            </Link>
-            <p className="font-script text-lg sm:text-xl text-accent">{meta.label}</p>
-            <h1 className="font-display mt-1 text-3xl font-extrabold leading-[1.05] sm:text-5xl lg:text-6xl max-w-4xl text-white">
-              {project.title}
-            </h1>
-            <p className="mt-3 text-xs sm:text-sm text-muted-dark uppercase tracking-widest font-semibold">
-              Client: {project.client}
-            </p>
+            <Reveal direction="left" duration={0.7}>
+              <Link
+                href="/#work"
+                className="group mb-4 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-dark transition-colors hover:text-accent"
+              >
+                <span className="transition-transform duration-300 group-hover:-translate-x-1">←</span> Back to all Case Studies
+              </Link>
+              <p className="font-script text-lg sm:text-xl text-accent">{meta.label}</p>
+            </Reveal>
+            <SplitText
+              as="h1"
+              text={project.title}
+              stagger={0.04}
+              className="font-display mt-1 block text-3xl font-extrabold leading-[1.05] sm:text-5xl lg:text-6xl max-w-4xl text-white"
+            />
+            <Reveal direction="up" delay={400} duration={0.7}>
+              <p className="mt-3 text-xs sm:text-sm text-muted-dark uppercase tracking-widest font-semibold">
+                Client: {project.client}
+              </p>
+            </Reveal>
           </div>
         </header>
 

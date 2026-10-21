@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Reveal from "@/components/Reveal";
 
 export function ChatMockup({ messages, photo }) {
   return (
@@ -10,8 +11,12 @@ export function ChatMockup({ messages, photo }) {
         </>
       )}
       {messages.map((m, i) => (
-        <div
+        <Reveal
           key={i}
+          direction={m.from === "agent" ? "left" : "right"}
+          delay={200 + i * 380}
+          duration={0.5}
+          threshold={0.01}
           className={`relative flex ${m.from === "agent" ? "justify-start" : "justify-end"}`}
         >
           <div
@@ -25,7 +30,7 @@ export function ChatMockup({ messages, photo }) {
           >
             {m.text}
           </div>
-        </div>
+        </Reveal>
       ))}
     </div>
   );
@@ -35,19 +40,23 @@ export function PipelineMockup({ columns }) {
   return (
     <div className="h-52 w-full overflow-hidden bg-[#111112] p-5 sm:h-full">
       <div className="grid h-full grid-cols-3 gap-3">
-        {columns.map((col) => (
+        {columns.map((col, ci) => (
           <div key={col.name} className="flex flex-col gap-2">
             <div className="flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-wider text-white/35">
               <span className="h-1 w-1 rounded-full bg-accent" />
               {col.name}
             </div>
             {col.cards.map((c, i) => (
-              <div
+              <Reveal
                 key={i}
-                className="rounded-lg border border-white/10 bg-white/[0.05] px-2.5 py-2 text-[10.5px] leading-snug text-white/70"
+                direction="down"
+                delay={150 + ci * 220 + i * 120}
+                duration={0.5}
+                threshold={0.01}
+                className="rounded-lg border border-white/10 bg-white/[0.05] px-2.5 py-2 text-[10.5px] leading-snug text-white/70 transition-colors duration-300 hover:border-accent/40 hover:text-white"
               >
                 {c}
-              </div>
+              </Reveal>
             ))}
           </div>
         ))}

@@ -3,19 +3,32 @@
 import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
+import CountUp from "@/components/CountUp";
 import { CheckIcon, LinkOutIcon } from "@/components/icons";
 import { CATEGORY_META } from "@/lib/projects";
+import { EASE_OUT } from "@/lib/motion";
+
+// Body sections cascade in once the dialog has landed.
+const body = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.07, delayChildren: 0.15 } },
+};
+
+const item = {
+  hidden: { opacity: 0, y: 18 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE_OUT } },
+};
 
 export default function CaseStudyModal({ project, isOpen, onClose }) {
   useEffect(() => {
+    if (!isOpen) return;
     const handleKeyDown = (e) => {
       if (e.key === "Escape") onClose();
     };
 
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-      window.addEventListener("keydown", handleKeyDown);
-    }
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
       document.body.style.overflow = "";
@@ -23,26 +36,44 @@ export default function CaseStudyModal({ project, isOpen, onClose }) {
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen || !project) return null;
+  return (
+    <AnimatePresence>
+      {isOpen && project && <ModalContent key={project.slug} project={project} onClose={onClose} />}
+    </AnimatePresence>
+  );
+}
 
+function ModalContent({ project, onClose }) {
   const meta = CATEGORY_META[project.categoryKey] || { label: "Project" };
   const Icon = project.Icon;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-10">
+    <motion.div
+      data-cursor-tone="dark"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-10"
+      initial="hidden"
+      animate="show"
+      exit="hidden"
+    >
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity duration-300 animate-fadeIn"
+      <motion.div
+        className="fixed inset-0 bg-black/80 backdrop-blur-md"
+        variants={{ hidden: { opacity: 0 }, show: { opacity: 1 } }}
+        transition={{ duration: 0.3 }}
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* Modal Dialog */}
-      <div
+      <motion.div
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
-        className="relative z-10 flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl bg-[#111112] text-ink shadow-[0_25px_70px_rgba(0,0,0,0.8)] border border-white/10 ring-1 ring-white/5 animate-scaleUp"
+        variants={{
+          hidden: { opacity: 0, y: 60, scale: 0.94, transition: { duration: 0.25, ease: "easeIn" } },
+          show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 260, damping: 26 } },
+        }}
+        className="relative z-10 flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl bg-[#111112] text-ink shadow-[0_25px_70px_rgba(0,0,0,0.8)] border border-white/10 ring-1 ring-white/5"
       >
         {/* Header Bar */}
         <div className="flex items-center justify-between border-b border-white/10 px-6 py-4 sm:px-8">
@@ -71,9 +102,9 @@ export default function CaseStudyModal({ project, isOpen, onClose }) {
         </div>
 
         {/* Scrollable Body */}
-        <div className="overflow-y-auto p-6 sm:p-8 space-y-8">
+        <motion.div variants={body} className="overflow-y-auto p-6 sm:p-8 space-y-8">
           {/* Title & Live Link */}
-          <div>
+          <motion.div variants={item}>
             <div className="flex flex-wrap items-center justify-between gap-4">
               <h2 id="modal-title" className="font-display text-2xl font-extrabold sm:text-4xl text-white">
                 {project.title}
@@ -92,11 +123,11 @@ export default function CaseStudyModal({ project, isOpen, onClose }) {
             <p className="mt-4 text-sm leading-relaxed text-muted-dark sm:text-base">
               {project.description || project.desc}
             </p>
-          </div>
+          </motion.div>
 
           {/* Key Stats Grid */}
           {project.stats && project.stats.length > 0 && (
-            <div>
+            <motion.div variants={item}>
               <h3 className="text-xs font-bold uppercase tracking-wider text-muted-dark mb-3">
                 Quantified Impact
               </h3>
@@ -107,7 +138,7 @@ export default function CaseStudyModal({ project, isOpen, onClose }) {
                     className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-center transition-colors hover:border-accent/40"
                   >
                     <p className="font-display text-2xl font-extrabold text-accent sm:text-3xl">
-                      {s.value}
+                      <CountUp value={s.value} />
                     </p>
                     <p className="mt-1 text-[11px] font-medium leading-tight text-muted-dark">
                       {s.label}
@@ -115,11 +146,11 @@ export default function CaseStudyModal({ project, isOpen, onClose }) {
                   </div>
                 ))}
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* Visual Showcase & Photo */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <motion.div variants={item} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {project.photo && (
               <div className="relative h-56 sm:h-64 overflow-hidden rounded-2xl border border-white/10">
                 <Image
@@ -140,11 +171,11 @@ export default function CaseStudyModal({ project, isOpen, onClose }) {
                 {project.cardVisual}
               </div>
             )}
-          </div>
+          </motion.div>
 
           {/* Key Features */}
           {project.features && (
-            <div>
+            <motion.div variants={item}>
               <h3 className="font-display text-xs font-bold uppercase tracking-wider text-white mb-3">
                 Key Deliverables & Features
               </h3>
@@ -161,12 +192,12 @@ export default function CaseStudyModal({ project, isOpen, onClose }) {
                   </li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
           )}
 
           {/* Before & After Box */}
           {project.compare && (
-            <div className="overflow-hidden rounded-2xl border border-white/10">
+            <motion.div variants={item} className="overflow-hidden rounded-2xl border border-white/10">
               <div className="grid grid-cols-1 sm:grid-cols-2">
                 <div className="bg-white/[0.04] p-5">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-muted-dark">
@@ -185,12 +216,12 @@ export default function CaseStudyModal({ project, isOpen, onClose }) {
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* Tech Stack */}
           {project.stack && (
-            <div>
+            <motion.div variants={item}>
               <h3 className="text-xs font-bold uppercase tracking-wider text-muted-dark mb-2">
                 Technology Stack
               </h3>
@@ -204,9 +235,9 @@ export default function CaseStudyModal({ project, isOpen, onClose }) {
                   </span>
                 ))}
               </div>
-            </div>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
 
         {/* Footer Actions */}
         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 bg-white/[0.02] px-6 py-4 sm:px-8">
@@ -224,7 +255,7 @@ export default function CaseStudyModal({ project, isOpen, onClose }) {
             Close
           </button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
