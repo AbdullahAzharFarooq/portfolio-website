@@ -329,6 +329,33 @@ function Screen({ slide, offset, compact, onSelect, dragged }) {
   );
 }
 
+function StageArrow({ dir, onClick }) {
+  const next = dir > 0;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={next ? "Next project" : "Previous project"}
+      className={`group absolute top-1/2 z-40 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-black/10 bg-white/90 text-ink-dark shadow-[0_18px_40px_-14px_rgba(10,10,10,0.45)] backdrop-blur-md transition-[background-color,color,scale,box-shadow] duration-300 hover:scale-110 hover:bg-ink-dark hover:text-accent hover:shadow-[0_0_30px_rgba(205,255,58,0.35)] active:scale-95 sm:h-14 sm:w-14 ${
+        next ? "right-0 translate-x-1/2" : "left-0 -translate-x-1/2"
+      }`}
+    >
+      <svg
+        viewBox="0 0 24 24"
+        className={`h-5 w-5 transition-transform duration-300 ${next ? "group-hover:translate-x-0.5" : "group-hover:-translate-x-0.5"}`}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d={next ? "M5 12h14M13 6l6 6-6 6" : "M19 12H5M11 6l-6 6 6 6"} />
+      </svg>
+    </button>
+  );
+}
+
 export default function Showcase() {
   const [index, setIndex] = useState(0);
   const [autoplay, setAutoplay] = useState(true);
@@ -367,6 +394,22 @@ export default function Showcase() {
     setAutoplay(false);
     progress.set(0);
     setIndex(((to % n) + n) % n);
+  };
+
+  // Trackpad side-swipes and Shift + mouse wheel step one project at a time.
+  const wheel = useRef({ sum: 0, lockedUntil: 0 });
+  const handleWheel = (e) => {
+    const dx = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.shiftKey ? e.deltaY : 0;
+    if (!dx) return;
+    const now = performance.now();
+    const w = wheel.current;
+    if (now < w.lockedUntil) return;
+    w.sum += dx;
+    if (Math.abs(w.sum) > 40) {
+      go(index + Math.sign(w.sum));
+      w.sum = 0;
+      w.lockedUntil = now + 650;
+    }
   };
 
   const handleDragEnd = (_, info) => {
@@ -416,34 +459,41 @@ export default function Showcase() {
           }}
           onPointerEnter={() => setPaused(true)}
           onPointerLeave={() => setPaused(false)}
+          onWheel={handleWheel}
           className="outline-none"
         >
-          <motion.div
-            ref={stageRef}
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.15}
-            onDragStart={() => {
-              dragged.current = true;
-            }}
-            onDragEnd={handleDragEnd}
-            className="relative mx-auto aspect-[4/5] w-[min(880px,82vw)] cursor-grab touch-pan-y [perspective:1800px] active:cursor-grabbing sm:aspect-[16/10]"
-          >
-            {SLIDES.map((slide, i) => {
-              let offset = (((i - index) % n) + n) % n;
-              if (offset > n / 2) offset -= n;
-              return (
-                <Screen
-                  key={slide.slug}
-                  slide={slide}
-                  offset={offset}
-                  compact={compact}
-                  dragged={dragged}
-                  onSelect={() => go(i)}
-                />
-              );
-            })}
-          </motion.div>
+          <div className="relative mx-auto w-[min(880px,82vw)]">
+            <motion.div
+              ref={stageRef}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.15}
+              onDragStart={() => {
+                dragged.current = true;
+              }}
+              onDragEnd={handleDragEnd}
+              className="relative aspect-[4/5] w-full cursor-grab touch-pan-y [perspective:1800px] active:cursor-grabbing sm:aspect-[16/10]"
+            >
+              {SLIDES.map((slide, i) => {
+                let offset = (((i - index) % n) + n) % n;
+                if (offset > n / 2) offset -= n;
+                return (
+                  <Screen
+                    key={slide.slug}
+                    slide={slide}
+                    offset={offset}
+                    compact={compact}
+                    dragged={dragged}
+                    onSelect={() => go(i)}
+                  />
+                );
+              })}
+            </motion.div>
+
+            {/* arrows sitting on the centre screen's edges, outside the draggable stage */}
+            <StageArrow dir={-1} onClick={() => go(index - 1)} />
+            <StageArrow dir={1} onClick={() => go(index + 1)} />
+          </div>
         </div>
       </Reveal>
 
