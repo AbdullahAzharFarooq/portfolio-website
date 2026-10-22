@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import Reveal from "@/components/Reveal";
 import SplitText from "@/components/SplitText";
 import { EASE_OUT } from "@/lib/motion";
@@ -102,35 +102,64 @@ const roll = {
 const GUTTER = "clamp(1.5rem, 5vw, 6rem)";
 const EDGE = `calc(${GUTTER} + max(0px, (100% - 2 * ${GUTTER} - 1400px) / 2))`;
 
-function StepCard({ step, active }) {
+// Every lit-up detail on a card uses the same curve and timing, so the
+// highlight glides between cards instead of snapping.
+const GLIDE = "duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]";
+
+/**
+ * One process step. All six share an identical structure (title area sized
+ * for two lines so the copy lines up across cards), and the active or hovered
+ * card lights up with the site's shared language: the outlined number fills
+ * with lime from below (as in Services), a lime rule draws along the top, and
+ * the icon flips to lime.
+ */
+function StepCard({ step, active, index }) {
   return (
-    <article
+    <motion.article
       data-step
-      className={`relative flex w-[min(82vw,380px)] shrink-0 snap-start flex-col overflow-hidden rounded-[28px] border p-7 transition-colors duration-500 sm:p-8 ${
-        active ? "border-accent/50 bg-[#15160f]" : "border-white/10 bg-[#101110] hover:border-white/20"
+      initial={{ opacity: 0, x: 70 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true, amount: 0.35 }}
+      transition={{ duration: 0.8, ease: EASE_OUT, delay: index < 4 ? index * 0.1 : 0 }}
+      className={`group relative flex w-[min(82vw,380px)] shrink-0 snap-start flex-col overflow-hidden rounded-[28px] border p-7 transition-[border-color,background-color,translate,box-shadow] sm:p-8 ${GLIDE} ${
+        active
+          ? "border-accent/50 bg-[#15160f] shadow-[0_30px_60px_-30px_rgba(205,255,58,0.25)]"
+          : "border-white/10 bg-[#101110] hover:-translate-y-1 hover:border-white/25"
       }`}
     >
-      {/* glow that follows the active card */}
+      {/* lime rule along the top */}
       <span
         aria-hidden="true"
-        className={`pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-accent/25 blur-3xl transition-opacity duration-700 ${
-          active ? "opacity-100" : "opacity-0"
+        className={`absolute inset-x-0 top-0 h-[3px] origin-left bg-accent transition-transform ${GLIDE} ${
+          active ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+        }`}
+      />
+      {/* soft glow in the corner */}
+      <span
+        aria-hidden="true"
+        className={`pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-accent/25 blur-3xl transition-opacity ${GLIDE} ${
+          active ? "opacity-100" : "opacity-0 group-hover:opacity-50"
         }`}
       />
 
       <div className="relative flex items-start justify-between">
-        <span
-          className={`font-display text-6xl font-extrabold leading-none transition-colors duration-500 sm:text-7xl ${
-            active ? "text-accent" : "text-outline-dark"
-          }`}
-        >
-          {step.n}
+        {/* outlined number with a lime fill that rises into it */}
+        <span className="font-display relative text-6xl font-extrabold leading-none sm:text-7xl">
+          <span className="text-outline-dark">{step.n}</span>
+          <span
+            aria-hidden="true"
+            className={`absolute inset-0 text-accent transition-[clip-path] ${GLIDE} ${
+              active ? "[clip-path:inset(0_0_0_0)]" : "[clip-path:inset(100%_0_0_0)] group-hover:[clip-path:inset(0_0_0_0)]"
+            }`}
+          >
+            {step.n}
+          </span>
         </span>
         <span
-          className={`flex h-12 w-12 items-center justify-center rounded-full border transition-all duration-500 ${
+          className={`flex h-12 w-12 items-center justify-center rounded-full border transition-[background-color,border-color,color,scale,box-shadow] ${GLIDE} ${
             active
-              ? "border-accent bg-accent text-black shadow-[0_0_28px_rgba(205,255,58,0.5)]"
-              : "border-white/15 text-muted-dark"
+              ? "scale-110 border-accent bg-accent text-black shadow-[0_0_28px_rgba(205,255,58,0.5)]"
+              : "border-white/15 text-muted-dark group-hover:scale-110 group-hover:border-accent group-hover:bg-accent group-hover:text-black"
           }`}
         >
           {step.icon}
@@ -138,23 +167,41 @@ function StepCard({ step, active }) {
       </div>
 
       <p className="relative mt-8 text-[11px] font-semibold uppercase tracking-[0.18em] text-accent/85">{step.phase}</p>
-      <h3 className="font-display relative mt-2 text-2xl font-bold leading-snug text-white">{step.title}</h3>
-      <p className="relative mt-3 text-sm leading-relaxed text-muted-dark">{step.desc}</p>
+      {/* reserves two lines so every description starts at the same height */}
+      <h3 className="font-display relative mt-2 min-h-[2lh] text-2xl font-bold leading-snug text-white">{step.title}</h3>
+      <p className="relative mb-7 mt-3 text-sm leading-relaxed text-muted-dark">{step.desc}</p>
 
-      <div className="relative mt-auto pt-7">
-        <div className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.03] py-1.5 pl-1.5 pr-4">
-          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/15 text-xs text-accent">✓</span>
-          <span className="text-xs font-medium text-white/80">{step.deliverable}</span>
-        </div>
+      {/* deliverable footer: a full-width row, so longer outcomes wrap neatly instead of bursting a pill */}
+      <div
+        className={`relative mt-auto flex items-start gap-3 border-t pt-5 transition-colors ${GLIDE} ${
+          active ? "border-accent/25" : "border-white/10"
+        }`}
+      >
+        <span
+          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs transition-colors ${GLIDE} ${
+            active ? "bg-accent text-black" : "bg-accent/15 text-accent group-hover:bg-accent group-hover:text-black"
+          }`}
+        >
+          ✓
+        </span>
+        <span>
+          <span className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-white/40">You get</span>
+          {/* two lines reserved so every footer starts on the same line */}
+          <span className="mt-1 block min-h-[2lh] text-sm font-medium leading-snug text-white/85">{step.deliverable}</span>
+        </span>
       </div>
-    </article>
+    </motion.article>
   );
 }
 
 function FinaleCard() {
   return (
-    <article
+    <motion.article
       data-cursor-tone="accent"
+      initial={{ opacity: 0, x: 70 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true, amount: 0.35 }}
+      transition={{ duration: 0.8, ease: EASE_OUT }}
       className="relative flex w-[min(82vw,400px)] shrink-0 snap-start flex-col justify-between overflow-hidden rounded-[28px] bg-accent p-8 text-ink-dark"
     >
       <div aria-hidden="true" className="animate-spin-slow pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full border border-dashed border-black/20" />
@@ -177,7 +224,7 @@ function FinaleCard() {
           ↗
         </span>
       </a>
-    </article>
+    </motion.article>
   );
 }
 
@@ -259,8 +306,12 @@ export default function Process() {
   const [active, setActive] = useState(0);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
-  const progress = useMotionValue(0);
-  const progressScale = useSpring(progress, { stiffness: 200, damping: 30, restDelta: 0.001 });
+  // Scroll thumb: its width is the visible share of the rail, its offset is how far along you are.
+  const thumbSize = useMotionValue(1);
+  const thumbOffset = useMotionValue(0);
+  const thumbSpring = { stiffness: 220, damping: 32, restDelta: 0.0005 };
+  const thumbWidth = useTransform(useSpring(thumbSize, thumbSpring), (v) => `${v * 100}%`);
+  const thumbLeft = useTransform(useSpring(thumbOffset, thumbSpring), (v) => `${v * 100}%`);
 
   useDragScroll(trackRef);
 
@@ -272,7 +323,8 @@ export default function Process() {
       frame = 0;
       const max = el.scrollWidth - el.clientWidth;
       const left = el.scrollLeft;
-      progress.set(max > 0 ? left / max : 0);
+      thumbSize.set(Math.min(1, el.clientWidth / el.scrollWidth));
+      thumbOffset.set(left / el.scrollWidth);
       setAtStart(left <= 4);
       setAtEnd(left >= max - 4);
 
@@ -304,7 +356,7 @@ export default function Process() {
       el.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
     };
-  }, [progress]);
+  }, [thumbSize, thumbOffset]);
 
   const nudge = (dir) => {
     const el = trackRef.current;
@@ -315,7 +367,7 @@ export default function Process() {
   const current = STEPS[active];
 
   return (
-    <section id="process" className="section-dark relative overflow-hidden pt-16 pb-24 sm:pt-20 sm:pb-32">
+    <section id="process" className="section-dark relative overflow-hidden pt-16 pb-20 sm:pt-20 sm:pb-24">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <div className="bg-grid absolute inset-0 opacity-50" />
         <div className="absolute left-1/3 top-1/2 h-[36rem] w-[36rem] -translate-y-1/2 rounded-full bg-accent/[0.06] blur-[150px]" />
@@ -375,8 +427,8 @@ export default function Process() {
         </div>
       </div>
 
-      {/* draggable, swipeable card rail */}
-      <Reveal direction="up" delay={150} duration={0.9} className="relative mt-12">
+      {/* draggable, swipeable card rail (each card animates itself in) */}
+      <div className="relative mt-12">
         <div
           ref={trackRef}
           role="region"
@@ -384,22 +436,23 @@ export default function Process() {
           tabIndex={0}
           onDragStart={(e) => e.preventDefault()}
           style={{ paddingLeft: EDGE, paddingRight: EDGE, scrollPaddingLeft: EDGE }}
-          className="no-scrollbar flex cursor-grab snap-x snap-mandatory items-stretch gap-6 overflow-x-auto overscroll-x-contain scroll-smooth pb-2 outline-none active:cursor-grabbing"
+          // vertical padding: a sideways-scrolling rail clips vertically too, so leave room for the hover lift and glow
+          className="no-scrollbar flex cursor-grab snap-x snap-mandatory items-stretch gap-6 overflow-x-auto overscroll-x-contain scroll-smooth pt-3 pb-12 outline-none active:cursor-grabbing"
         >
           {STEPS.map((step, i) => (
-            <StepCard key={step.n} step={step} active={i === active} />
+            <StepCard key={step.n} step={step} index={i} active={i === active} />
           ))}
           <FinaleCard />
         </div>
-      </Reveal>
+      </div>
 
       {/* progress + hint */}
-      <div className="container-px relative mt-8">
+      <div className="container-px relative mt-2">
         <div className="mx-auto flex max-w-[1400px] items-center gap-5">
-          <span className="relative h-[2px] flex-1 overflow-hidden rounded-full bg-white/10">
+          <span className="relative h-[3px] flex-1 overflow-hidden rounded-full bg-white/10">
             <motion.span
-              className="absolute inset-0 origin-left bg-accent shadow-[0_0_10px_rgba(205,255,58,0.7)]"
-              style={{ scaleX: progressScale }}
+              className="absolute inset-y-0 rounded-full bg-accent shadow-[0_0_10px_rgba(205,255,58,0.7)]"
+              style={{ left: thumbLeft, width: thumbWidth }}
             />
           </span>
           <span className="shrink-0 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-dark">

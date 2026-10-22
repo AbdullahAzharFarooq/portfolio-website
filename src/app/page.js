@@ -1,7 +1,7 @@
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
-import Toolkit from "@/components/Toolkit";
+import Showcase from "@/components/Showcase";
 import Services from "@/components/Services";
 import SectionDivider from "@/components/SectionDivider";
 import Process from "@/components/Process";
@@ -16,7 +16,7 @@ export default function Home() {
       <main>
         <Hero />
         <About />
-        <Toolkit />
+        <Showcase />
         <Services />
         <SectionDivider />
         <Process />

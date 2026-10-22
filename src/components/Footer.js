@@ -6,7 +6,7 @@ import Wordmark from "@/components/Wordmark";
 
 const SITEMAP = [
   { label: "About", href: "/#about" },
-  { label: "Stack", href: "/#stack" },
+  { label: "Showcase", href: "/#showcase" },
   { label: "Solutions", href: "/#services" },
   { label: "Process", href: "/#process" },
   { label: "Results", href: "/#results" },
@@ -27,7 +27,7 @@ const EMAIL = "abdullahazharfarooq01@gmail.com";
 const SOCIALS = [
   {
     label: "Instagram",
-    href: "https://www.instagram.com/abdullahazhar71?utm_source=ig_web_button_share_sheet&igsi=ZDNlZDc0MzIxNw==",
+    href: "https://www.instagram.com/abdullahazhar731",
     icon: (
       <>
         <rect x="3" y="3" width="18" height="18" rx="5" />
@@ -38,7 +38,7 @@ const SOCIALS = [
   },
   {
     label: "Facebook",
-    href: "https://www.facebook.com/share/19VCUxujwA/?mibextid=wwXIfr",
+    href: "https://www.facebook.com/share/1CN2WK1LQC/",
     icon: <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />,
   },
 ];
